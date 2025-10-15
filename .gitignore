@@ -1,0 +1,19 @@
+# Fichiers IntelliJ
+*.iml
+.idea/
+out/
+
+# Fichiers build Maven / Gradle
+/target/
+/build/
+
+# Logs
+*.log
+
+# Fichiers sensibles
+application.properties
+application.yml
+
+# OS files
+.DS_Store
+Thumbs.db
