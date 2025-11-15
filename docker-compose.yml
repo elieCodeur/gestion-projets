@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata_fresh_start:/var/lib/postgresql/data  # Changement de nom du volume
 
 volumes:
-  pgdata:
+  pgdata_fresh_start: # Changement de nom du volume

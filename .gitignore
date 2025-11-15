@@ -1,57 +1,31 @@
-# =======================
-# IntelliJ IDEA
-# =======================
-*.iml
+# Fichiers et dossiers générés par les IDE
 .idea/
+.vscode/
+*.iml
 *.iws
 *.ipr
-out/
 
-# =======================
-# Maven
-# =======================
-/target/
-/pom.xml.tag
-/pom.xml.releaseBackup
-/pom.xml.versionsBackup
-/logs/
-/dependency-reduced-pom.xml
-/buildNumber.properties
-/release.properties
-
-# =======================
-# Gradle (au cas où)
-# =======================
-/build/
-/.gradle/
-/gradle-app.setting
-!gradle-wrapper.jar
-!gradle-wrapper.properties
-
-# =======================
-# Spring Boot
-# =======================
-/spring-boot.log
+# Fichiers de log
 *.log
+logs/
 
-# =======================
-# Configuration sensibles
-# =======================
-application.properties
-application.yml
-*.secret
-*.env
+# Fichiers de build Java/Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
 
-# =======================
-# System files
-# =======================
+# Fichiers de build Node.js/Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env.local
+frontend/.env.*.local
+
+# Fichiers système
 .DS_Store
 Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# =======================
-# IDE & Editors
-# =======================
-.vscode/
-*.swp

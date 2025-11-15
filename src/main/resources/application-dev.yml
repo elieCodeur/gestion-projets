@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devdb
+    username: devuser
+    password: devpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # crée/actualise automatiquement les tables selon tes entités
+    show-sql: true       # affiche les requêtes SQL dans la console
+    properties:
+      hibernate:
+        format_sql: true # rend les requêtes plus lisibles
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  # Active les logs de débogage au besoin
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  port: 8080
