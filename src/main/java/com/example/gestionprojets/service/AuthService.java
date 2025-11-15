@@ -14,6 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,7 +36,6 @@ public class AuthService {
         Role userRole = roleRepository.findByName(request.getRole())
                 .orElseThrow(() -> new RuntimeException("Role not found: " + request.getRole()));
 
-        // Remplacer le builder par un constructeur et des setters
         User user = new User();
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
@@ -43,8 +45,13 @@ public class AuthService {
         
         userRepository.save(user);
         
-        var jwtToken = jwtService.generateToken(user);
-        return new LoginResponse(jwtToken); // Utiliser le constructeur
+        // Ajouter le prénom et le nom comme claims
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("firstname", user.getFirstname());
+        extraClaims.put("lastname", user.getLastname());
+
+        var jwtToken = jwtService.generateToken(extraClaims, user);
+        return new LoginResponse(jwtToken);
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -57,7 +64,12 @@ public class AuthService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found after authentication"));
         
-        var jwtToken = jwtService.generateToken(user);
-        return new LoginResponse(jwtToken); // Utiliser le constructeur
+        // Ajouter le prénom et le nom comme claims
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("firstname", user.getFirstname());
+        extraClaims.put("lastname", user.getLastname());
+
+        var jwtToken = jwtService.generateToken(extraClaims, user);
+        return new LoginResponse(jwtToken);
     }
 }

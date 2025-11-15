@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { Loader2, Send, MessageSquare } from 'lucide-react';
-import { useAuth } from '../context/AuthContext'; // Pour obtenir l'ID de l'utilisateur courant
+import { Loader2, Send, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface Message {
   id: number;
@@ -10,17 +10,18 @@ interface Message {
   senderFirstname: string;
   senderLastname: string;
   content: string;
-  sentAt: string; // LocalDateTime sera sérialisé en String
+  sentAt: string;
 }
 
 const MessagePage: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
-  const { user } = useAuth(); // Récupérer l'utilisateur courant
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newMessageContent, setNewMessageContent] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null); // Pour le scroll automatique
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (projectId) {
@@ -29,7 +30,6 @@ const MessagePage: React.FC = () => {
   }, [projectId]);
 
   useEffect(() => {
-    // Scroll vers le bas à chaque nouveau message
     scrollToBottom();
   }, [messages]);
 
@@ -43,11 +43,8 @@ const MessagePage: React.FC = () => {
       const response = await api.get<Message[]>(`/messages/project/${pId}`);
       setMessages(response.data);
       setError(null);
-
-      // Marquer les messages comme lus après les avoir récupérés
-      if (user && response.data.some(msg => msg.senderId !== user.id)) { // Ne marquer comme lu que si l'utilisateur n'est pas l'expéditeur
+      if (user && response.data.length > 0) {
         await api.put(`/messages/project/${pId}/mark-as-read`);
-        // Optionnel: Rafraîchir le nombre de notifications non lues sur le dashboard si nécessaire
       }
     } catch (err) {
       setError('Erreur lors de la récupération des messages.');
@@ -68,7 +65,7 @@ const MessagePage: React.FC = () => {
       setMessages((prev) => [...prev, response.data]);
       setNewMessageContent('');
     } catch (err) {
-      setError('Erreur lors de l\'envoi du message.');
+      setError("Erreur lors de l'envoi du message.");
       console.error(err);
     }
   };
@@ -92,10 +89,18 @@ const MessagePage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-full flex flex-col">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Messagerie du Projet {projectId}</h1>
+    <div className="p-6 bg-gray-50 min-h-full flex flex-col h-full">
+      <div className="flex items-center mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center justify-center p-2 rounded-full hover:bg-gray-200 transition duration-200 mr-4"
+        >
+          <ArrowLeft className="h-6 w-6 text-gray-700" />
+        </button>
+        <h1 className="text-3xl font-bold text-gray-800">Messagerie du Projet {projectId}</h1>
+      </div>
 
-      <div className="flex-1 bg-white p-6 rounded-lg shadow-md overflow-y-auto mb-4 max-h-[60vh] flex flex-col space-y-4">
+      <div className="flex-1 bg-white p-6 rounded-lg shadow-md overflow-y-auto mb-4 flex flex-col space-y-4">
         {messages.length === 0 ? (
           <p className="text-center text-gray-500 py-8">Aucun message pour ce projet. Soyez le premier à envoyer un message !</p>
         ) : (
@@ -114,7 +119,7 @@ const MessagePage: React.FC = () => {
                 <div className="font-semibold text-sm mb-1">
                   {msg.senderId === user?.id ? 'Vous' : `${msg.senderFirstname} ${msg.senderLastname}`}
                 </div>
-                <p className="text-sm">{msg.content}</p>
+                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                 <div className="text-right text-xs mt-1 opacity-80">
                   {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
@@ -122,7 +127,7 @@ const MessagePage: React.FC = () => {
             </div>
           ))
         )}
-        <div ref={messagesEndRef} /> {/* Point de scroll */}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-md flex items-center">

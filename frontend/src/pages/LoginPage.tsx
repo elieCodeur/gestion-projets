@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AuthContext } from '../context/AuthContext';
+import api from '../services/api'; // Importer api
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Adresse email invalide' }),
@@ -32,7 +33,9 @@ const LoginPage: React.FC = () => {
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await login(data);
+      const response = await api.post('/auth/login', data);
+      const token = response.data.token;
+      login(token);
       navigate('/dashboard');
     } catch (error: any) {
       setError('root', {

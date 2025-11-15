@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { PlusCircle, Book, BarChart2, Bell, Loader2, Eye } from 'lucide-react'; // Remplacer KanbanSquare par Eye
+import { PlusCircle, Book, BarChart2, Bell, Loader2, Eye } from 'lucide-react';
 import api from '../services/api';
 
 interface Project {
@@ -60,10 +60,9 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-full">
-      {/* En-tête */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Bonjour, {user?.sub || 'Étudiant'} !</h1>
+          <h1 className="text-3xl font-bold text-gray-800">Bonjour, {user?.firstname || 'Étudiant'} !</h1>
           <p className="text-gray-600">Bienvenue sur votre tableau de bord.</p>
         </div>
         <Link to="/projects/new">
@@ -74,7 +73,6 @@ const DashboardPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Grille des widgets */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-md flex items-center">
           <Book className="h-8 w-8 text-blue-500 mr-4" />
@@ -99,7 +97,6 @@ const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Liste des projets */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Mes Projets</h2>
         {loading && (

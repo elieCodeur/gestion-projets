@@ -60,7 +60,7 @@ const KanbanHubPage: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-full">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Sélectionnez un Projet pour le Kanban</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Sélectionnez un Sprint pour le Kanban</h1>
       
       {projects.length === 0 ? (
         <p className="text-center text-gray-500 py-8">Vous n'avez encore aucun projet. Créez-en un pour commencer à utiliser le Kanban !</p>
@@ -75,14 +75,16 @@ const KanbanHubPage: React.FC = () => {
                 <p className="text-sm text-gray-500">Aucun sprint défini pour ce projet.</p>
               ) : (
                 <div className="space-y-2">
-                  {project.sprints.map(sprint => (
-                    <Link key={sprint.id} to={`/projects/${project.id}/sprints/${sprint.id}/kanban`}>
-                      <button className="w-full flex items-center justify-center bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 text-sm">
-                        <KanbanSquare className="mr-2 h-4 w-4" />
-                        {sprint.name} (Sprint {sprint.sprintNumber})
-                      </button>
-                    </Link>
-                  ))}
+                  {[...project.sprints] // Créer une copie pour ne pas muter l'état original
+                    .sort((a, b) => a.sprintNumber - b.sprintNumber) // Trier les sprints par leur numéro
+                    .map(sprint => (
+                      <Link key={sprint.id} to={`/projects/${project.id}/sprints/${sprint.id}/kanban`}>
+                        <button className="w-full flex items-center justify-center bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 text-sm">
+                          <KanbanSquare className="mr-2 h-4 w-4" />
+                          {sprint.name}
+                        </button>
+                      </Link>
+                    ))}
                 </div>
               )}
             </div>

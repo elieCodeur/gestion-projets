@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
-import { PlusCircle, Edit, Trash2, Loader2 } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { PlusCircle, Edit, Trash2, Loader2, ArrowLeft } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 interface Task {
   id: number;
   title: string;
   description: string;
-  status: string; // "À faire", "En cours", "Terminé"
+  status: string;
   sprintId: number;
   assignedUserId?: number;
   assignedUserFirstname?: string;
@@ -30,11 +30,12 @@ const initialColumns: Column[] = [
 
 const KanbanBoard: React.FC = () => {
   const { projectId, sprintId } = useParams<{ projectId: string; sprintId: string }>();
+  const navigate = useNavigate();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [currentTask, setCurrentTask] = useState<Task | null>(null); // Pour l'édition
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -123,19 +124,16 @@ const KanbanBoard: React.FC = () => {
     const newStatus = initialColumns.find((col) => col.id === destination.droppableId)?.status;
     if (!newStatus) return;
 
-    // Mise à jour optimiste de l'UI
     const updatedTasks = tasks.map((task) =>
       task.id === Number(draggableId) ? { ...task, status: newStatus } : task
     );
     setTasks(updatedTasks);
 
-    // Appel API pour mettre à jour le statut
     try {
       await api.put(`/tasks/${draggedTask.id}`, { status: newStatus });
     } catch (err) {
       setError('Erreur lors de la mise à jour du statut de la tâche.');
       console.error(err);
-      // Revenir à l'état précédent en cas d'erreur
       setTasks(tasks);
     }
   };
@@ -177,8 +175,17 @@ const KanbanBoard: React.FC = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-full">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Tableau Kanban du Projet {projectId} - Sprint {sprintId}</h1>
+      <div className="flex items-center mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center justify-center p-2 rounded-full hover:bg-gray-200 transition duration-200 mr-4"
+        >
+          <ArrowLeft className="h-6 w-6 text-gray-700" />
+        </button>
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold text-gray-800">Tableau Kanban</h1>
+          <p className="text-sm text-gray-500">Projet {projectId} - Sprint {sprintId}</p>
+        </div>
         <button
           onClick={openCreateModal}
           className="flex items-center bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300"
@@ -266,7 +273,7 @@ const KanbanBoard: React.FC = () => {
               className="border border-gray-300 w-full mb-3 p-2 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
               rows={3}
             />
-            {currentTask && ( // Le statut n'est modifiable que lors de l'édition
+            {currentTask && (
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
@@ -277,7 +284,6 @@ const KanbanBoard: React.FC = () => {
                 <option value="Terminé">Terminé</option>
               </select>
             )}
-            {/* Champ pour assigner un utilisateur (pour plus tard) */}
             <input
               type="number"
               placeholder="ID utilisateur assigné (optionnel)"
